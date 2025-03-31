@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat | GlobalPay</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .sidebar {
+            transition: all 0.3s;
+        }
+        .message-container {
+            height: calc(100vh - 300px);
+        }
+        .typing-indicator:after {
+            content: '...';
+            animation: typing 1.5s infinite;
+        }
+        @keyframes typing {
+            0% { content: '.'; }
+            33% { content: '..'; }
+            66% { content: '...'; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar (same as dashboard) -->
+        <div class="sidebar w-64 bg-gray-800 text-white p-4">
+            <div class="flex items-center space-x-2 p-2 mb-8">
+                <i class="fas fa-globe text-blue-400 text-2xl"></i>
+                <h1 class="text-xl font-bold">GlobalPay</h1>
+            </div>
+            
+            <nav>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="dashboard.html" class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700">
+                            <i class="fas fa-home w-6"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="transactions.html" class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700">
+                            <i class="fas fa-exchange-alt w-6"></i>
+                            <span>Transactions</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700 bg-gray-700">
+                            <i class="fas fa-comments w-6"></i>
+                            <span>Chat</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-2 p-2 rounded hover:bg-gray-700">
+                            <i class="fas fa-cog w-6"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="absolute bottom-0 left-0 right-0 p-4 bg-gray-900">
+                <button id="logout-btn" class="w-full flex items-center space-x-2 p-2 rounded hover:bg-gray-800">
+                    <i class="fas fa-sign-out-alt w-6"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col">
+            <header class="bg-white shadow-sm p-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-gray-800">Global Chat</h2>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <i class="fas fa-bell text-gray-500 hover:text-blue-500 cursor-pointer"></i>
+                            <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                                <span id="user-initial">U</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 flex flex-col p-4">
+                <!-- Chat Rooms Sidebar -->
+                <div class="flex flex-col md:flex-row flex-1 gap-4">
+                    <div class="w-full md:w-64 bg-white rounded-lg shadow p-4">
+                        <h3 class="font-semibold mb-4">Chat Rooms</h3>
+                        <ul class="space-y-2">
+                            <li>
+                                <button class="chat-room-btn w-full text-left p-2 rounded hover:bg-gray-100 bg-gray-100" data-room="global">
+                                    <i class="fas fa-globe mr-2 text-blue-500"></i>
+                                    Global Chat
+                                </button>
+                            </li>
+                            <li>
+                                <button class="chat-room-btn w-full text-left p-2 rounded hover:bg-gray-100" data-room="crypto">
+                                    <i class="fab fa-bitcoin mr-2 text-orange-500"></i>
+                                    Crypto Discussion
+                                </button>
+                            </li>
+                            <li>
+                                <button class="chat-room-btn w-full text-left p-2 rounded hover:bg-gray-100" data-room="fiat">
+                                    <i class="fas fa-money-bill-wave mr-2 text-green-500"></i>
+                                    Fiat Transactions
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Chat Container -->
+                    <div class="flex-1 flex flex-col bg-white rounded-lg shadow overflow-hidden">
+                        <!-- Chat Header -->
+                        <div class="p-4 border-b border-gray-200">
+                            <h3 id="current-room" class="font-semibold">Global Chat</h3>
+                            <p id="room-description" class="text-sm text-gray-500">Discuss general topics with the community</p>
+                        </div>
+
+                        <!-- Messages Container -->
+                        <div id="messages" class="message-container p-4 overflow-y-auto">
+                            <div class="text-center text-gray-500 py-8">
+                                Loading messages...
+                            </div>
+                        </div>
+
+                        <!-- Typing Indicator -->
+                        <div id="typing-indicator" class="px-4 pb-2 text-sm text-gray-500 hidden">
+                            <span class="typing-indicator"></span>
+                        </div>
+
+                        <!-- Message Input -->
+                        <div class="p-4 border-t border-gray-200">
+                            <form id="message-form" class="flex gap-2">
+                                <input 
+                                    type="text" 
+                                    id="message-input" 
+                                    placeholder="Type your message..." 
+                                    class="flex-1 border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                >
+                                <button 
+                                    type="submit" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                >
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="scripts/chat.js"></script>
+</body>
+</html>
